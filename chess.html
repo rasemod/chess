@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./chess.css">
+    <title>Chess</title>
+</head>
+<body>
+    <!-- 
+        1. Нарисовать доску по центру
+        2. Таймер над доской (остчёт времени на текущий код и общее время игры )
+        3. Клетки тёмно серые и светло серые
+        4. По бокам доски нумерация и латинские буквы
+        5. Слева подвижное меню
+            1. Выбор цвета
+            2. Старт игры
+            3. Прекратить игру 
+        6. История ходов
+        Посмотреть как записывается шахматные ходы
+        Посмотреть правила
+        JS
+        1. Object board
+            1. Field (клетка)
+        2. Object figures
+            1. figure
+
+     -->
+
+     <div class="current-time">
+
+     </div>
+     <button class="start" type="button">
+        start
+     </button>
+     <button class="finish" type="button" disabled>
+        finish
+     </button>
+     <div class="start-time">
+
+     </div>
+     <div class="duration">
+
+     </div>
+
+     <div class="chessboard" id="chessboard">
+        <ul class="numbers">
+
+        </ul>
+        <ul class="letters">
+
+        </ul>
+     </div>
+     <script src="chess.js" type="text/javascript"></script>
+</body>
+</html>
