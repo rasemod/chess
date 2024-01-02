@@ -35,6 +35,10 @@
     background-color: yellow;
 }
 
+.possibleShot {
+    background-color: rgb(162, 16, 16);
+}
+
 .numbers {
     position: absolute;
     display: flex;

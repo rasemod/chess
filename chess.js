@@ -236,29 +236,77 @@ document.onload = (function () {
       return this.arrChar[num]
     }
 
-    getSquareContent(activeFig, posibility) {
+    getSquareContent(activeFig, posibility, possibleShot = false) {
+      if (!possibleShot) {
+        possibleShot = [...posibility]
+      }
       console.log(activeFig, posibility)
       const positionX = this.getNumByChar(activeFig.position.charAt(0))
       const positionY = parseInt(activeFig.position.charAt(1)) - 1
 
       document.querySelectorAll('.square.possible').forEach((element) => {
-        element.classList.remove('possible') 
-      })  
+        element.classList.remove('possible')
+      })
 
+      document.querySelectorAll('.square.possibleShot').forEach((element) => {
+        element.classList.remove('possibleShot')
+      })
+
+      let x, y
+      // цикл для проверки возможных ходов
       for (let posible of posibility) {
-
-        const pos = this.getCharByNum(positionX + posible[0]) + (+positionY + 1 + posible[1])
-        const square = this.board[pos] 
-
-        if (square) {
-          document.querySelector(`[data-pos = '${pos}']`).classList.add('possible')
+        if (typeof posible[0] === "number" && typeof posible[1] === "number") {
+          x = posible[0]
+          y = posible[1]
+        } else {
+          x = posible[0]
+          y = posible[1]
         }
-        console.log(this.board[pos])  
+
+        const posY = +positionY + 1 + y
+        const posX = +positionX + x
+
+        console.log(posY, typeof posY)
+        if (posY > 0 && posY < 9 && posX > -1 && posX < 8) {
+          const pos = this.getCharByNum(posX) + posY
+          const square = this.board[pos]
+          if (square && !square.content) {
+            document.querySelector(`[data-pos = '${pos}']`).classList.add('possible')
+          }
+        }
+
       }
 
-      /*return this.board [
-          this.getCharByNum(posX) + (posY + 1)
-        ].content*/
+      // цикл для проверки возможного боя
+      for (let posible of possibleShot) {
+        if (typeof posible[0] === "number" && typeof posible[1] === "number") {
+          x = posible[0]
+          y = posible[1]
+        } else {
+          x = posible[0]
+          y = posible[1]
+        }
+
+        const posY = +positionY + 1 + y
+        const posX = +positionX + x
+
+        if (posY > 0 && posY < 9 && posX > -1 && posX < 8) {
+
+          const pos = this.getCharByNum(posX) + posY
+          const square = this.board[pos]
+
+          if (square && !!square.content) {
+            if (this.getColorFig(square.content) !== this.getColorFig(activeFig.id)) {
+              document.querySelector(`[data-pos = '${pos}']`).classList.add('possibleShot')
+            }
+          }
+        }
+      }
+    }
+
+    getColorFig(id) {
+      const color = id.split("_")
+      return color[1]
     }
 
 
@@ -316,13 +364,13 @@ document.onload = (function () {
         {
           name: "pawn",
           id: "pawn_b_1",
-          initPosition: "a7",
+          initPosition: "g3",
           svg: pawn_b,
         },
         {
           name: "pawn",
           id: "pawn_b_2",
-          initPosition: "b7",
+          initPosition: "e3",
           svg: pawn_b,
         },
         {
@@ -340,7 +388,7 @@ document.onload = (function () {
         {
           name: "pawn",
           id: "pawn_b_5",
-          initPosition: "e7",
+          initPosition: "f4",
           svg: pawn_b,
         },
         {
@@ -406,7 +454,7 @@ document.onload = (function () {
         {
           name: "king",
           id: "king_w_1",
-          initPosition: "e1",
+          initPosition: "g4",
           svg: king_w,
         },
         {
@@ -505,9 +553,9 @@ document.onload = (function () {
         if (event.target.classList.contains("possible")) {
           if (activeFig) {
             activeFig.position = event.target.dataset.pos;
-          
+
             function redrawChessboard() {
-              
+
             }
 
             this.redrawChessboard();
@@ -524,50 +572,51 @@ document.onload = (function () {
               return false
             }
           })
-         // console.log(activeFig)
+          // console.log(activeFig)
 
           const [nameFig, colorFig, numberFig] = activeFig.id.split("_")
 
           switch (nameFig) {
-            case "pawn": 
-            
-            /* 
-              [0,1] - просто пойти вперёд
-              [-1,1] - бить влево
-              [1,1] - бить вправо
-              [0,2] - пойти вперёд на 2 клетки
-            */
+            case "pawn":
 
-              
-
+              /* 
+                [0,1] - просто пойти вперёд
+                [-1,1] - бить влево
+                [1,1] - бить вправо
+                [0,2] - пойти вперёд на 2 клетки
+              */
               if (colorFig === "w") {
 
-                const posibilityWhitePawn = [[0,1], [-1,1], [1,1]]
+                const posibilityWhitePawn = [[0, 1]]
+                const posibilityWhitePawnShot = [[-1, 1], [1, 1]]
 
                 if (activeFig.position === activeFig.initPosition) { // можно ходить через одну клетку пешке
-                  posibilityWhitePawn.push([0,2])
+                  posibilityWhitePawn.push([0, 2])
                 }
                 // создать подсвечивание ходов надо подсвечивать тольчо data-pos в htmL 
-                this.getSquareContent(activeFig, posibilityWhitePawn)
+                this.getSquareContent(activeFig, posibilityWhitePawn, posibilityWhitePawnShot)
               }
-              
+              break;
+
+            case "king":
+              if (colorFig === "w") {
+
+                const posibilityWhiteKing = [[0, 1], [1, 1], [-1, 1], [1, 0], [-1, 0], [-1, -1], [0, -1], [1, -1]]
+
+                //console.log(colorFig, numberFig)
+
+                if (activeFig.position === activeFig.initPosition) {
+                  console.log(activeFig.position.split(""))
+                }
+                this.getSquareContent(activeFig, posibilityWhiteKing)
+              }
               break;
             case "knight":
               if (colorFig === "w") {
                 console.log(colorFig, numberFig)
 
-                const posibilityWhiteKnight = [[-2, -1], [-2, 1], [-1, -2], [-1, 2],[1, -2], [1, 2], [2, -1], [2, 1]];
+                const posibilityWhiteKnight = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
 
-                if (activeFig.position === activeFig.initPosition) {
-                  console.log(activeFig.position.split(""))
-                } else {
-
-                }
-              }
-              break;
-            case "king":
-              if (colorFig === "w") {
-                console.log(colorFig, numberFig)
                 if (activeFig.position === activeFig.initPosition) {
                   console.log(activeFig.position.split(""))
                 } else {
